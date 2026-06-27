@@ -9,3 +9,5 @@ com/
 *.dll
 *.so
 *.dylib
+
+nul
