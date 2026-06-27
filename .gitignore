@@ -1,0 +1,11 @@
+project/target/
+project/libs/
+project/dependency-reduced-pom.xml
+decompiled_src/
+META-INF/
+com/
+*.class
+*.jar
+*.dll
+*.so
+*.dylib
