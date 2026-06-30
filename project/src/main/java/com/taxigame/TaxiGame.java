@@ -740,13 +740,14 @@ public class TaxiGame extends SimpleApplication {
         // Obstacle collisions
         for (Obstacle o : this.obstacles) {
             float d = taxiPos.distance(o.getPosition());
-            if (d < 3.0f) {
+            if (d < 3.0f && !o.isStunned()) {
                 if (this.totalFareEarned > 0.0f) {
                     this.totalFareEarned = Math.max(0.0f, this.totalFareEarned - 10.0f);
                 }
                 this.collisions++;
                 this.deliveryStreak = 0;
-                this.taxi.pushBackFrom(o.getPosition());
+                this.taxi.crashStop(o.getPosition(), this.city);
+                o.stun();
                 this.showMessage("Crash! -$10 | Streak reset!", 1.5f);
                 break;
             }

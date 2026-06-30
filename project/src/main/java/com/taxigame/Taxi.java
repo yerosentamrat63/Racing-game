@@ -16,7 +16,6 @@ public class Taxi {
     private static final float TURN_RATE = 2.4f;
     private static final float DRAG = 0.7f;
     private static final float HAND_BRAKE = 40.0f;
-    private static final float HAND_BRAKE_TURN = 4.8f;
     private final Node node;
     private final Vector3f position = new Vector3f(0.0f, 0.0f, 0.0f);
     private float heading = 0.0f;
@@ -58,8 +57,7 @@ public class Taxi {
         }
         float speedFactor = Math.min(1.0f, Math.abs(this.speed) / 4.0f);
         float dir = this.speed >= 0.0f ? 1.0f : -1.0f;
-        float turnRate = handbrake ? HAND_BRAKE_TURN : TURN_RATE;
-        this.heading += steer * turnRate * speedFactor * tpf * dir;
+        this.heading += steer * TURN_RATE * speedFactor * tpf * dir;
         float dx = FastMath.sin(this.heading) * this.speed * tpf;
         float dz = FastMath.cos(this.heading) * this.speed * tpf;
         float newX = this.position.x + dx;
@@ -83,15 +81,24 @@ public class Taxi {
         this.updateTransform();
     }
 
-    public void pushBackFrom(Vector3f other) {
-        Vector3f away = this.position.subtract(other).normalizeLocal();
-        float newX = this.position.x + away.x * 2.0f;
-        float newZ = this.position.z + away.z * 2.0f;
-        float limit = 55.0f;
+    public void crashStop(Vector3f otherPos, City city) {
+        this.speed = 0.0f;
+        Vector3f away = this.position.subtract(otherPos).normalizeLocal();
+        float newX = this.position.x + away.x * 1.2f;
+        float newZ = this.position.z + away.z * 1.2f;
+        float limit = 63.0f;
         newX = Math.max(-limit, Math.min(limit, newX));
         newZ = Math.max(-limit, Math.min(limit, newZ));
-        this.position.set(newX, this.position.y, newZ);
-        this.speed *= -0.3f;
+        boolean blocked = false;
+        for (City.Bounds b : city.getBuildingBounds()) {
+            if (b.contains(newX, newZ, 1.6f)) {
+                blocked = true;
+                break;
+            }
+        }
+        if (!blocked) {
+            this.position.set(newX, this.position.y, newZ);
+        }
         this.updateTransform();
     }
 

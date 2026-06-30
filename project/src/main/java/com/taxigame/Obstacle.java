@@ -13,12 +13,14 @@ public class Obstacle {
     private static final float SPEED = 6.0f;
     private static final float RADIUS = 1.6f;
     private static final float LANE_OFFSET = 2.5f;
+    private static final float STUN_DURATION = 1.5f;
     private static final String[] CAR_MODELS = new String[]{"Models/Cars/sedan.glb", "Models/Cars/suv.glb", "Models/Cars/van.glb", "Models/Cars/police.glb", "Models/Cars/hatchback-sports.glb"};
     private final Node node;
     private final City city;
     private final Random rng = new Random();
     private float heading;
     private float turnCooldown = 0.0f;
+    private float stunTimer = 0.0f;
     private int roadIndex;
     private boolean horizontal;
 
@@ -57,6 +59,10 @@ public class Obstacle {
     }
 
     public void update(float tpf, List<Obstacle> allObstacles) {
+        if (this.stunTimer > 0.0f) {
+            this.stunTimer -= tpf;
+            return;
+        }
         float dx = FastMath.sin(this.heading) * SPEED * tpf;
         float dz = FastMath.cos(this.heading) * SPEED * tpf;
         float newX = this.node.getLocalTranslation().x + dx;
@@ -126,5 +132,13 @@ public class Obstacle {
 
     public float getRadius() {
         return 1.6f;
+    }
+
+    public void stun() {
+        this.stunTimer = STUN_DURATION;
+    }
+
+    public boolean isStunned() {
+        return this.stunTimer > 0.0f;
     }
 }
